@@ -92,35 +92,23 @@ function App(): JSX.Element {
 
   const takePhoto = async () => {
     if (camera !== null && camera.current !== null) {
-      console.clear()
       const file = await camera.current.takePhoto()
-      console.log('file', file)
       const result = await fetch(`file://${file.path}`)
-      console.log('result', result)
       const data = await result.blob();
-      console.log('data', data)
-      const photoBase64 = blobToBase64(data)
-      .then((base64) => base64)
-      .catch((error) => {
-        console.error('Erro ao converter Blob para base64:', error);
-      });
-      console.log('gerou foto', photoBase64)
-      console.log('restante a enviar', {
+      setShowCamera(false)
+      const base64Photo = await blobToBase64(data)
+
+      firestore()
+      .collection('moment')
+      .add({
+        image: base64Photo,
         localization: 'hehe boy',
-        user: userInfo?.user.name,
+        user: userInfo ? userInfo.user.name : '',
         date: '25/04/1993'
       })
-      // firestore()
-      // .collection('moment')
-      // .add({
-      //   image: photoBase64,
-      //   localization: 'hehe boy',
-      //   user: userInfo?.name,
-      //   date: firestore.FieldValue.serverTimestamp()
-      // })
-      // .then(() => Alert.alert("Momento", "Momento salvo com sucesso!"))
-      // .catch((error) => Alert.alert("Erro", "Ocorreu um erro. Tente novamente mais tarde.")))
-      // .finally(() => setShowCamera(false))
+      .then(() => Alert.alert("Momento", "Momento salvo com sucesso!"))
+      .catch((error) => Alert.alert("Erro", "Ocorreu um erro. Tente novamente mais tarde."))
+      .finally(() => setShowCamera(false))
     }
   }
 
@@ -132,6 +120,7 @@ function App(): JSX.Element {
       reader.readAsDataURL(blob);
     });
   };
+
 
   return (
     <>
