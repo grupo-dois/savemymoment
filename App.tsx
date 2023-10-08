@@ -5,12 +5,11 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
@@ -53,6 +52,7 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [userInfo, setUserInfo] = useState<{ [key: string]: any }>();
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -63,11 +63,21 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <HeaderLogin />
+        <HeaderLogin userInfo={userInfo} setUserInfo={setUserInfo} />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
+          <Text
+            style={[
+              styles.sectionDescription,
+              {
+                color: isDarkMode ? Colors.light : Colors.dark,
+              },
+            ]}
+          >
+            Usuário: {userInfo?.user.name}
+          </Text>
           <Section title="Btn">
             Section para botão de call to action
           </Section>
@@ -91,6 +101,7 @@ const styles = StyleSheet.create({
   },
   sectionDescription: {
     marginTop: 8,
+    marginLeft: 8,
     fontSize: 18,
     fontWeight: '400',
   },

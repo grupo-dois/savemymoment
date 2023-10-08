@@ -1,10 +1,35 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-function HeaderLogin(): JSX.Element {
-  const loginAtFirebase = () => {
-    console.log('loginAtFirebase')
-  }
+GoogleSignin.configure({
+  webClientId: '596648308005-h5o8rqs0hhcvrkhuuu915ml80gpnseam.apps.googleusercontent.com',
+});
+
+interface Props {
+  userInfo: { [key: string]: any } | undefined,
+  setUserInfo: (userInfo: { [key: string]: any }) => void,
+}
+
+const HeaderLogin: React.FC<Props> = ({ userInfo, setUserInfo }) => {
+  const loginAtFirebase = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      setUserInfo({...userInfo});
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      setUserInfo({});
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <View style={styles.header}>
@@ -12,7 +37,8 @@ function HeaderLogin(): JSX.Element {
         <Text style={styles.headerText}>SaveMyMoment</Text>
       </View>
       <View>
-        <Button title="Login" color="#808080" onPress={() => loginAtFirebase()} />
+        {!userInfo?.idToken ? (<Button title="Login" color="#808080" onPress={() => loginAtFirebase()} />)
+        : (<Button title="Logout" color="#808080" onPress={() => signOut()} />)}
       </View>
     </View>
   )
