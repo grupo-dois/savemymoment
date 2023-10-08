@@ -1,11 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -18,51 +11,22 @@ import {
   Button,
   Alert,
 } from 'react-native';
-import HeaderLogin from './components/HeaderLogin'
+import HeaderLogin from './components/HeaderLogin';
 import firestore from '@react-native-firebase/firestore';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useCurrentLocation } from './hooks';
 import { useCameraPermission, Camera, useCameraDevice } from 'react-native-vision-camera';
-
-
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
 function App(): JSX.Element {
-  const [moments, setMoments] = useState<{ [key: string]: any }[]>([]);
+  const [moments, setMoments] = useState<{[key: string]: any}[]>();
+  const isDarkMode = useColorScheme() === 'dark';
+  const { currentLocation } = useCurrentLocation();
+  const [userInfo, setUserInfo] = useState<{[key: string]: any}>();
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
-  const isDarkMode = useColorScheme() === 'dark';
-  const [userInfo, setUserInfo] = useState<{ [key: string]: any }>();
   const [showCamera, setShowCamera] = useState<boolean>();
   const camera = useRef<Camera>(null)
 
@@ -73,16 +37,16 @@ function App(): JSX.Element {
   useEffect(() => {
     firestore()
       .collection('moment')
-      .onSnapshot((querySnapshot) => {
-        const data = querySnapshot.docs.map((doc) => {
+      .onSnapshot(querySnapshot => {
+        const data = querySnapshot.docs.map(doc => {
           return {
             id: doc.id,
-            ...doc.data()
-          }
-        })
-        setMoments(data)
+            ...doc.data(),
+          };
+        });
+        setMoments(data);
       });
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (showCamera) {
@@ -182,7 +146,7 @@ function App(): JSX.Element {
             style={{
               backgroundColor: '#e6e6e6',
             }}>
-            {userInfo && userInfo?.user?.name &&(<Text
+            {userInfo && userInfo?.user.name &&(<Text
               style={[
                 styles.sectionDescription,
                 {
