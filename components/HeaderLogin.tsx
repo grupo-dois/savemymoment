@@ -2,13 +2,17 @@ import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 
 function HeaderLogin(): JSX.Element {
+  const loginAtFirebase = () => {
+    console.log('loginAtFirebase')
+  }
+
   return (
     <View style={styles.header}>
       <View>
         <Text style={styles.headerText}>SaveMyMoment</Text>
       </View>
       <View>
-        <Button title={'login'} />
+        <Button title="Login" color="#808080" onPress={() => loginAtFirebase()} />
       </View>
     </View>
   )
