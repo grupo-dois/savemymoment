@@ -1,13 +1,7 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  PermissionsAndroid,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -15,10 +9,9 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import HeaderLogin from './components/HeaderLogin'
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+import HeaderLogin from './components/HeaderLogin';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useCurrentLocation} from './hooks';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -52,7 +45,8 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  const [userInfo, setUserInfo] = useState<{ [key: string]: any }>();
+  const {currentLocation} = useCurrentLocation();
+  const [userInfo, setUserInfo] = useState<{[key: string]: any}>();
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -74,16 +68,11 @@ function App(): JSX.Element {
               {
                 color: isDarkMode ? Colors.light : Colors.dark,
               },
-            ]}
-          >
-            Usuário: {userInfo?.user.name}
+            ]}>
+            Usuário: {userInfo?.user?.name}
           </Text>
-          <Section title="Btn">
-            Section para botão de call to action
-          </Section>
-          <Section title="List">
-            Section para listagem de fotos
-          </Section>
+          <Section title="Btn">Section para botão de call to action</Section>
+          <Section title="List">Section para listagem de fotos</Section>
         </View>
       </ScrollView>
     </SafeAreaView>
