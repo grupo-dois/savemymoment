@@ -157,22 +157,22 @@ function App(): JSX.Element {
               Usuário: {userInfo?.user?.name}
             </Text>)}
             {moments?.map(moment => (
-              <>
-              <View style={styles.photoSection}>
-                <Text style={styles.userTitle}>{ moment.user }</Text>
-                <Image
-                  key={moment.id}
-                  style={styles.photo}
-                  source={{
-                    uri: moment.image,
-                  }}
-                />
-                <Text style={styles.subtitle}>{ moment.date } - { moment.localization }</Text>
+              <View key={moment.id}>
+                <View style={styles.photoSection}>
+                  <Text style={styles.userTitle}>{ moment.user }</Text>
+                  <Image
+                    key={moment.id}
+                    style={styles.photo}
+                    source={{
+                      uri: moment.image,
+                    }}
+                  />
+                  <Text style={styles.subtitle}>{ moment.date } - { moment.localization }</Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
+                </View>
               </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
-              </View>
-              </>
             ))}
             {moments?.length === 0 && (
               <Text style={{
