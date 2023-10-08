@@ -5,18 +5,17 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   View,
 } from 'react-native';
-
+import HeaderLogin from './components/HeaderLogin'
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
@@ -53,6 +52,7 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [userInfo, setUserInfo] = useState<{ [key: string]: any }>();
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -63,13 +63,21 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
+        <HeaderLogin userInfo={userInfo} setUserInfo={setUserInfo} />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Header Login">
-            Section para Header Login
-          </Section>
+          <Text
+            style={[
+              styles.sectionDescription,
+              {
+                color: isDarkMode ? Colors.light : Colors.dark,
+              },
+            ]}
+          >
+            Usuário: {userInfo?.user.name}
+          </Text>
           <Section title="Btn">
             Section para botão de call to action
           </Section>
@@ -93,6 +101,7 @@ const styles = StyleSheet.create({
   },
   sectionDescription: {
     marginTop: 8,
+    marginLeft: 8,
     fontSize: 18,
     fontWeight: '400',
   },
