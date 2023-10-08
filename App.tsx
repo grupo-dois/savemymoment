@@ -85,7 +85,7 @@ function App(): JSX.Element {
       .collection('moment')
       .add({
         image: base64Photo,
-        localization: 'hehe boy',
+        localization: currentLocation,
         user: userInfo ? userInfo.user.name : '',
         date: getCurrentDate()
       })
