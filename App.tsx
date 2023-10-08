@@ -1,7 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
-  PermissionsAndroid,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,17 +8,27 @@ import {
   useColorScheme,
   View,
   Image,
+  Button,
+  Alert,
 } from 'react-native';
 import HeaderLogin from './components/HeaderLogin';
 import firestore from '@react-native-firebase/firestore';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {useCurrentLocation} from './hooks';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useCurrentLocation } from './hooks';
+import { useCameraPermission, Camera, useCameraDevice } from 'react-native-vision-camera';
 
+type SectionProps = PropsWithChildren<{
+  title: string;
+}>;
 function App(): JSX.Element {
   const [moments, setMoments] = useState<{[key: string]: any}[]>();
   const isDarkMode = useColorScheme() === 'dark';
-  const {currentLocation} = useCurrentLocation();
+  const { currentLocation } = useCurrentLocation();
   const [userInfo, setUserInfo] = useState<{[key: string]: any}>();
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const device = useCameraDevice('back');
+  const [showCamera, setShowCamera] = useState<boolean>();
+  const camera = useRef<Camera>(null)
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -39,33 +48,118 @@ function App(): JSX.Element {
       });
   }, []);
 
+  useEffect(() => {
+    if (showCamera) {
+      requestCameraPermission()
+    }
+  }, [showCamera])
+
+  const requestCameraPermission = () => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }
+
+  const getCurrentDate = () => {
+    const dataAtual: Date = new Date();
+
+    const dia: number = dataAtual.getDate();
+    const mes: number = dataAtual.getMonth() + 1;
+    const ano: number = dataAtual.getFullYear();
+
+    const diaFormatado: string = dia < 10 ? '0' + dia : dia.toString();
+    const mesFormatado: string = mes < 10 ? '0' + mes : mes.toString();
+
+    return diaFormatado + '/' + mesFormatado + '/' + ano;
+  }
+
+  const takePhoto = async () => {
+    if (camera !== null && camera.current !== null) {
+      const file = await camera.current.takePhoto()
+      const result = await fetch(`file://${file.path}`)
+      const data = await result.blob();
+      setShowCamera(false)
+      const base64Photo = await blobToBase64(data)
+
+      firestore()
+      .collection('moment')
+      .add({
+        image: base64Photo,
+        localization: currentLocation,
+        user: userInfo ? userInfo.user.name : '',
+        date: getCurrentDate()
+      })
+      .then(() => Alert.alert("Momento", "Momento salvo com sucesso!"))
+      .catch((error) => Alert.alert("Erro", "Ocorreu um erro. Tente novamente mais tarde."))
+      .finally(() => setShowCamera(false))
+    }
+  }
+
+  const blobToBase64 = (blob: Blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   return (
-    <SafeAreaView style={Colors.lighter}>
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <HeaderLogin userInfo={userInfo} setUserInfo={setUserInfo} />
-        <View
-          style={{
-            backgroundColor: '#e6e6e6',
-          }}>
-          {userInfo && (
-            <Text
+    <>
+      {showCamera ?
+      (
+        <>
+          <Camera
+            ref={camera}
+            style={StyleSheet.absoluteFill}
+            device={device}
+            isActive={true}
+            photo={true}
+          />
+          <View style={{marginTop: '165%', marginHorizontal: '10%'}}>
+            <Button
+              onPress={() => takePhoto()}
+              title="Tirar Foto"
+            />
+          </View>
+          <View style={{marginTop: '4%', marginHorizontal: '10%'}}>
+            <Button
+              onPress={() => setShowCamera(false)}
+              title="Voltar"
+            />
+          </View>
+        </>
+      ) :
+      <SafeAreaView style={Colors.lighter}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={backgroundStyle}
+        >
+          <HeaderLogin userInfo={userInfo} setUserInfo={setUserInfo} />
+          <View style={{margin: 5}}>
+            <Button
+              onPress={() => setShowCamera(true)}
+              title="Registrar Momento"
+            />
+          </View>
+          <View
+            style={{
+              backgroundColor: '#e6e6e6',
+            }}>
+            {userInfo && userInfo?.user.name &&(<Text
               style={[
                 styles.sectionDescription,
                 {
                   color: isDarkMode ? Colors.light : Colors.dark,
                 },
-              ]}>
+              ]}
+            >
               Usuário: {userInfo?.user?.name}
-            </Text>
-          )}
-          {moments?.map(moment => {
-            console.log(moment);
-            return (
-              <>
+            </Text>)}
+            {moments?.map(moment => (
+              <View key={moment.id}>
                 <View style={styles.photoSection}>
-                  <Text style={styles.userTitle}>{moment.user}</Text>
+                  <Text style={styles.userTitle}>{ moment.user }</Text>
                   <Image
                     key={moment.id}
                     style={styles.photo}
@@ -73,22 +167,25 @@ function App(): JSX.Element {
                       uri: moment.image,
                     }}
                   />
-                  <Text style={styles.subtitle}>{moment.text}</Text>
-                  <Text style={styles.dateLocalization}>
-                    {moment.date} - {moment.localization}
-                  </Text>
+                  <Text style={styles.subtitle}>{ moment.date } - { moment.localization }</Text>
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <View
-                    style={{flex: 1, height: 1, backgroundColor: 'black'}}
-                  />
+                  <View style={{flex: 1, height: 1, backgroundColor: 'black'}} />
                 </View>
-              </>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+              </View>
+            ))}
+            {moments?.length === 0 && (
+              <Text style={{
+                ...styles.subtitle,
+                textAlign: 'center'
+              }}>
+                Não há momentos a serem mostrados.
+              </Text>
+            )}
+          </View>
+        </ScrollView>
+      </SafeAreaView>}
+    </>
   );
 }
 
@@ -120,12 +217,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginLeft: 5,
-    marginTop: 2,
-  },
-  dateLocalization: {
-    fontSize: 10,
-    marginLeft: 5,
-    marginTop: 2,
+    marginTop: 5
   },
   photo: {
     width: '100%',
