@@ -84,10 +84,29 @@ function App(): JSX.Element {
       });
   }, [])
 
+  useEffect(() => {
+    if (showCamera) {
+      requestCameraPermission()
+    }
+  }, [showCamera])
+
   const requestCameraPermission = () => {
     if (!hasPermission) {
       requestPermission();
     }
+  }
+
+  const getCurrentDate = () => {
+    const dataAtual: Date = new Date();
+
+    const dia: number = dataAtual.getDate();
+    const mes: number = dataAtual.getMonth() + 1;
+    const ano: number = dataAtual.getFullYear();
+
+    const diaFormatado: string = dia < 10 ? '0' + dia : dia.toString();
+    const mesFormatado: string = mes < 10 ? '0' + mes : mes.toString();
+
+    return diaFormatado + '/' + mesFormatado + '/' + ano;
   }
 
   const takePhoto = async () => {
@@ -104,7 +123,7 @@ function App(): JSX.Element {
         image: base64Photo,
         localization: 'hehe boy',
         user: userInfo ? userInfo.user.name : '',
-        date: '25/04/1993'
+        date: getCurrentDate()
       })
       .then(() => Alert.alert("Momento", "Momento salvo com sucesso!"))
       .catch((error) => Alert.alert("Erro", "Ocorreu um erro. Tente novamente mais tarde."))
@@ -120,7 +139,6 @@ function App(): JSX.Element {
       reader.readAsDataURL(blob);
     });
   };
-
 
   return (
     <>
@@ -164,7 +182,7 @@ function App(): JSX.Element {
             style={{
               backgroundColor: '#e6e6e6',
             }}>
-            {userInfo &&(<Text
+            {userInfo && userInfo?.user?.name &&(<Text
               style={[
                 styles.sectionDescription,
                 {
@@ -172,7 +190,7 @@ function App(): JSX.Element {
                 },
               ]}
             >
-              Usuário: {userInfo?.user.name}
+              Usuário: {userInfo?.user?.name}
             </Text>)}
             {moments?.map(moment => (
               <>
