@@ -16,7 +16,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-
+import HeaderLogin from './components/HeaderLogin'
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
@@ -63,13 +63,11 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
+        <HeaderLogin />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Header Login">
-            Section para Header Login
-          </Section>
           <Section title="Btn">
             Section para botão de call to action
           </Section>
