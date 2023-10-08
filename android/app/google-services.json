@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "596648308005",
+    "project_id": "savemymoment-g2-firebase",
+    "storage_bucket": "savemymoment-g2-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596648308005:android:7b6f5512a02856db2abecc",
+        "android_client_info": {
+          "package_name": "com.savemymoment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596648308005-i65s744r3ifagb8arle9hhitf94k380i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.savemymoment",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "596648308005-h5o8rqs0hhcvrkhuuu915ml80gpnseam.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG9VHuN6eCk8dKL1V3QG29fscvZX8dmJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596648308005-h5o8rqs0hhcvrkhuuu915ml80gpnseam.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
