@@ -174,7 +174,6 @@ function App(): JSX.Element {
                   moment.image,
                 )}?alt=media`;
 
-                console.log({url});
                 return (
                   <View key={moment.id}>
                     <View style={styles.photoSection}>
