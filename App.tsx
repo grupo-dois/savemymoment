@@ -79,10 +79,8 @@ function App(): JSX.Element {
       const file = await camera.current.takePhoto({
         qualityPrioritization: 'speed',
       });
-      const result = await fetch(`file://${file.path}`);
-      const data = await result.blob();
+
       setShowCamera(false);
-      const base64Photo = await blobToBase64(data);
 
       try {
         const timestamp = Date.now();
@@ -113,15 +111,6 @@ function App(): JSX.Element {
         console.log({error});
       }
     }
-  };
-
-  const blobToBase64 = (blob: Blob) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   };
 
   return (
